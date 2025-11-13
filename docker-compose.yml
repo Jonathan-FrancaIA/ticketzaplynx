@@ -1,0 +1,89 @@
+gemiversion: "3.8"
+
+networks:
+  proxy:
+    name: nginx-proxy-manager_default
+    external: true
+
+volumes:
+  postgres_data_whaticket02:
+  redis_data:
+  backend_files:
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - BACKEND_URL=https://api.zaplynx.com.br
+      - FRONTEND_URL=https://app.zaplynx.com.br
+      - PORT=8080
+      - DB_DIALECT=postgres
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=whaticket02
+      - DB_PASS=123456789
+      - DB_NAME=whaticket02
+      - REDIS_URI=redis://redis:6379
+      - VIRTUAL_HOST=api.zaplynx.com.br
+      - VIRTUAL_PORT=8080
+      - LETSENCRYPT_HOST=api.zaplynx.com.br
+      - JWT_SECRET=kZaOTd+YZpjRUyyuQUpigJaEMk4vcW4YOymKPZX0Ts8=
+      - JWT_REFRESH_SECRET=dBSXqFg9TaNUEDXVp6fhMTRLBysP+j2DSqf7+raxD3A=
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - proxy
+    restart: unless-stopped
+    volumes:
+      - backend_files:/usr/src/app/public
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_BACKEND_URL: https://api.zaplynx.com.br
+    environment:
+      - REACT_APP_BACKEND_URL=https://api.zaplynx.com.br
+      - VIRTUAL_HOST=app.zaplynx.com.br
+      - VIRTUAL_PORT=8081
+      - LETSENCRYPT_HOST=app.zaplynx.com.br
+    ports:
+      - "8081:8081"
+    depends_on:
+      - backend
+    networks:
+      - proxy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    volumes:
+      - postgres_data_whaticket02:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=whaticket02
+      - POSTGRES_DB=whaticket02
+      - POSTGRES_PASSWORD=123456789
+      - TZ=America/Sao_Paulo
+    ports:
+      - "5432:5432"
+    networks:
+      - proxy
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - proxy
+    restart: unless-stopped

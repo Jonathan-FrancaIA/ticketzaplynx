@@ -1,0 +1,98 @@
+  Descrição
+  Este projeto visa melhorar o sistema de IA do Whaticket para criar um agente de IA inteligente e autônomo que mantém contexto da conversa, reconhece filas e tags
+  existentes no sistema, executa ações automaticamente e faz resumos inteligentes para economizar tokens.
+
+  Objetivo
+   - Implementar contexto persistente usando Redis
+   - Criar um agente de IA com acesso ao banco de dados
+   - Permitir que a IA transfira para filas e adicione tags automaticamente     
+   - Implementar resumos inteligentes para economizar tokens
+   - Melhorar a experiência de atendimento ao cliente
+
+  Arquivos a serem alterados
+
+  Backend
+   1. backend/src/services/IntegrationsServices/OpenAiService.ts - Principal serviço de IA      
+   2. backend/src/services/WbotServices/wbotMessageListener.ts - Listener de mensagens
+   3. backend/src/services/WebhookService/ActionsWebhookService.ts - Serviço de ações do webhook
+   4. backend/src/libs/redis.ts - Configuração do Redis (se necessário)
+   5. backend/src/utils/sessionContextManager.ts - Novo serviço para gerenciamento de contexto  
+   6. backend/src/utils/conversationSummarizer.ts - Novo serviço para resumos
+
+  Frontend
+   1. frontend/src/components/FlowBuilderAddOpenAIModal/index.js - Modal de configuração do OpenAI
+   2. frontend/src/components/FlowBuilderGeminiModal/index.js - Modal de configuração do Gemini
+
+  Checklist de Implementação
+
+  ✅ Concluído
+   - [x] Aumentar limite de tokens para 16000 no frontend OpenAI
+   - [x] Aumentar limite de tokens para 16000 no frontend Gemini
+   - [x] Modificar backend para permitir até 16000 tokens para modelos GPT-4    
+
+  📋 A Fazer
+   - [ ] Configuração do Redis para armazenamento de contexto (existente no docker-compose.yml)
+   - [ ] Criação do serviço de gerenciamento de contexto de sessão
+   - [ ] Atualização do OpenAiService para usar contexto persistente
+   
+   - [ ] Implementar serviço de resumos inteligentes para conversas longas
+   - [ ] Implementar acesso às filas do sistema no agente de IA
+   - [ ] Implementar acesso às tags do sistema no agente de IA
+   - [ ] Criar funcionalidades de transferência automática de filas
+   - [ ] Criar funcionalidades de adição automática de tags
+   - [ ] Atualizar o listener de mensagens para usar o novo contexto
+   - [ ] Atualizar o serviço de ações do webhook para integrar com o agente
+   - [ ] Testes de integração
+   - [ ] Documentação da API do agente de IA
+
+  Resumos Inteligentes
+   - O agente fará resumos automáticos de conversas longas para economizar tokens
+   - Manterá o contexto principal enquanto reduz o volume de dados processados   
+   - Preservação de informações críticas durante o resumo
+
+  Exemplo de Uso de Resumo
+  Quando a conversa ultrapassar um limite configurável (ex: 50 mensagens), o sistema:
+   1. Gera um resumo conciso mantendo pontos principais
+   2. Mantém as últimas N mensagens para contexto imediato
+   3. Armazena o resumo no contexto do Redis
+   4. Continua a conversa com contexto otimizado
+
+  Funcionalidades do Agente de IA
+
+  Atuais
+   - Respostas em modo "permanent" e "temporary"
+   - Transferência para filas com "Ação: Transferir para o setor de atendimento"
+   - Contexto limitado de conversas anteriores
+
+  Futuras (com implementação completa)
+   - Contexto persistente com Redis
+   - Acesso a filas existentes no sistema
+   - Acesso a tags existentes no sistema
+   - Transferência automática para filas específicas
+   - Adição automática de tags conforme necessidade
+   - Tomada de decisão inteligente baseada em dados do sistema
+   - Memória de conversa perfeita com histórico completo      
+   - Resumos inteligentes para economizar tokens
+   - Gestão automática de contexto para otimizar uso de tokens
+
+  Exemplo de Uso
+
+  Com o agente completo implementado, o prompt pode incluir instruções como:
+
+   1 Se o caso envolver acidente de trabalho, transfira para a fila "Acidentes de Trabalho".
+   2 Se o cliente for demitido sem justa causa, adicione a tag "Demissão Sem Justa Causa".
+   3 Faça resumos de conversas com mais de 30 mensagens para economizar tokens.
+
+  A IA entenderia essas instruções e executaria as ações automaticamente.
+
+  Benefícios
+
+   - Redução do trabalho manual de configuração
+   - Atendimento mais inteligente e automatizado
+   - Economia de tokens com resumos inteligentes
+   - Melhor experiência para os clientes
+   - Integração completa com as funcionalidades do sistema
+
+  Status Atual
+  O projeto está em fase de implementação com os primeiros passos concluídos (aumento de tokens e configuração do Redis existente) e a implementação do contexto persistente  
+  com Redis em andamento. A funcionalidade de resumos inteligentes será implementada na próxima fase.
